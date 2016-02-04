@@ -19,9 +19,9 @@ import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
 
 import org.apache.commons.lang3.StringUtils;
+import org.pushio.webapp.helper.Constants;
+import org.pushio.webapp.helper.collection.Collections3;
 import org.pushio.webapp.support.persistence.SearchFilter.Operator;
-import org.pushio.webapp.util.Collections3;
-import org.pushio.webapp.util.Constants;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.jpa.domain.Specification;
