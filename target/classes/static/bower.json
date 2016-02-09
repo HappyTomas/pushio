@@ -1,0 +1,30 @@
+{
+  "name": "testBoot",
+  "description": "baseProject",
+  "main": "bootTest",
+  "moduleType": [
+    "amd",
+    "es6",
+    "globals",
+    "node",
+    "yui"
+  ],
+  "keywords": [
+    "boot"
+  ],
+  "authors": [
+    "mumuiscool"
+  ],
+  "license": "MIT",
+  "homepage": "pushio",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "angular": "^1.4.9"
+  }
+}
