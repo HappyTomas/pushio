@@ -6,6 +6,7 @@ import java.util.List;
 import org.pushio.webapp.support.Fastjson2HttpMessageConverter;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.builder.SpringApplicationBuilder;
 import org.springframework.boot.orm.jpa.EntityScan;
 import org.springframework.context.annotation.ComponentScan;
@@ -13,16 +14,15 @@ import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.http.converter.HttpMessageConverter;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.annotation.Scheduled;
-import org.springframework.session.data.redis.config.annotation.web.http.EnableRedisHttpSession;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter;
 
+@SpringBootApplication
 @EnableScheduling
 @EnableAutoConfiguration
 @ComponentScan("org.pushio.webapp")
 @EntityScan("org.pushio.webapp.entity")
 @EnableJpaRepositories("org.pushio.webapp.repository")
-@EnableRedisHttpSession
 public class Start extends WebMvcConfigurerAdapter{
 
 		

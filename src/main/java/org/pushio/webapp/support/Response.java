@@ -37,7 +37,7 @@ public class Response implements Serializable {
 
 	public short getErrorcode() {
 		if (validErrors.size() > 0) {
-			errorcode = ErrorCode.VALID_FAIL;
+			errorcode = StatusCode.VALID_FAIL;
 			message = "验证失败";
 		}
 		return errorcode;

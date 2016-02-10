@@ -16,8 +16,6 @@ import org.springframework.transaction.support.TransactionSynchronizationManager
  * @author 赵宝东
  *
  */
-@ContextConfiguration(locations = { "classpath:applicationContext.xml" })
-@RunWith(SpringJUnit4ClassRunner.class)
 public class JunitEntityManagerHolder {
 	EntityManager em = null;
 
@@ -37,10 +35,4 @@ public class JunitEntityManagerHolder {
 		EntityManagerHolder emHolder = (EntityManagerHolder) TransactionSynchronizationManager
 				.unbindResource(emf);
 	}
-	
-	@Test
-	public void run(){
-
-	}
-
 }

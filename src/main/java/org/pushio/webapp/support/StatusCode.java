@@ -1,6 +1,6 @@
 package org.pushio.webapp.support;
 
-public class ErrorCode {
+public class StatusCode {
 	public static final short OK = 1;//成功
 	
 	public static final short VALID_FAIL = 100;//表单提交验证失败

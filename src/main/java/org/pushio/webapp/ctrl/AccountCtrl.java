@@ -3,6 +3,7 @@ package org.pushio.webapp.ctrl;
 import java.util.Map;
 
 import javax.servlet.ServletRequest;
+import javax.servlet.http.HttpSession;
 
 import org.pushio.webapp.entity.base.Account;
 import org.pushio.webapp.helper.servlet.Servlets;
@@ -24,13 +25,14 @@ public class AccountCtrl extends BaseController{
 	
 	@RequestMapping(value = "/find")
 	@ResponseBody
-	public Response findPage(ServletRequest request,PageRequest pageRequest, Response response) {
+	public Response findPage(ServletRequest request,PageRequest pageRequest, Response response,HttpSession session ) {
+		session.setAttribute("userRedis", "en");
 		Map<String, Object> searchParams = Servlets.getParametersStartingWith(request, "");
 		Page<Account> page = accountService.findPage(searchParams, pageRequest);
 		response.setFieldPaths(new String[]{
 			"addUser"
 		});
-		response.setData(page  );
+		response.setData(session.getId());
 		return response;
 	}
 }

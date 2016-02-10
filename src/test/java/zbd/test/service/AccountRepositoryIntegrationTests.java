@@ -11,6 +11,8 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
+import zbd.test.JunitEntityManagerHolder;
+
 /**
  * Integration tests for {@link CityRepository}.
  *
@@ -18,7 +20,7 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
  */
 @RunWith(SpringJUnit4ClassRunner.class)
 @SpringApplicationConfiguration(SampleDataJpaApplication.class)
-public class AccountRepositoryIntegrationTests {
+public class AccountRepositoryIntegrationTests extends JunitEntityManagerHolder{
 
 	@Autowired
 	AccountRepository repository;
