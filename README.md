@@ -6,3 +6,5 @@ JAVA8
 
 包整理完毕,开干！
 
+这个SESSION 与 HIBERANTE QUERY CACHE SECOND LEVLE CACHE都使用了 REDIS , SO 为了方便开发, 大家可以下载大微软的REDIS2.8版本,必须2.8以上哦
+https://github.com/MSOpenTech/redis/releases
