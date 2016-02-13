@@ -14,12 +14,14 @@ import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.http.converter.HttpMessageConverter;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.annotation.Scheduled;
+import org.springframework.transaction.annotation.EnableTransactionManagement;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter;
 
 @SpringBootApplication
 @EnableScheduling
 @EnableAutoConfiguration
+@EnableTransactionManagement
 @ComponentScan("org.pushio.webapp")
 @EntityScan("org.pushio.webapp.entity")
 @EnableJpaRepositories("org.pushio.webapp.repository")
