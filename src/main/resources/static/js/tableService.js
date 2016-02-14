@@ -21,63 +21,27 @@ app.provider('tableDataService', function() {
 		}
 	};
 
+	var testFun = function() {
+		//console.info('testFun');
+	};
 	//保存处理器
-	var saveHandle = function($scope,$http,operData, filterFunc) {
-//		console.info('startToSave...saveUrl=', $scope.saveurl);
-		$scope.operData = $.convertObject2Params(operData, filterFunc);
+		//$scope.save =
+	var saveHandle = function($scope,$http,operData) {
+		console.info('startToSave...saveUrl=', $scope.saveurl);
+		$scope.operData = $.convertObject2Params(operData);
 		//console.info('startToSave...$scope.operData=', $scope.operData);
-
-		if($scope.validMsg){
-			//清空验证信息
-			for(var key in $scope.validMsg){
-				var __index = key.indexOf(".");
-				if(__index > -1){
-					var __index_str = key.substring(0,__index);
-					if(!$scope.validMsg[__index_str]){
-						$scope.validMsg[__index_str] = {};
-					}
-					$scope.validMsg[__index_str][key.substring(__index+1)] = "";
-				}else{
-					$scope.validMsg[key] = "";
-				}
-			}
-		}
-		
 		$http.get($scope.saveurl, {
 			params: $scope.operData
 		}).success(function(response) {
-			if(response.errorcode == 1){
-				$scope.isItemShow = function(data) {
-					return false;
-				}
-			}		
-			
-			if(response.errorcode == 100){
-				if(!$scope.validMsg){
-					$scope.validMsg = {}; //页面验证信息保存对象
-				}
-				//设置验证信息
-				for(var key in response.validErrors){
-					var __index = key.indexOf(".");
-					if(__index > -1){
-						var __index_str = key.substring(0,__index);
-						if(!$scope.validMsg[__index_str]){
-							$scope.validMsg[__index_str] = {};
-						}
-						$scope.validMsg[__index_str][key.substring(__index+1)] = response.validErrors[key];
-					}else{
-						$scope.validMsg[key] = response.validErrors[key];
-					}
-				}
-				return;
-			}
+			$("#my-alert .am-modal-bd").html(response.message);
+			var $modal = $('#my-alert').modal();
 			if (YHUtil.hasObj(response.data)) {
 				$scope.isAdd = !$scope.isAdd;
 				$scope.operData = response.data;
 				$scope.operData.isShowEdit=false;
 			}
 			//刷新表格
-			$scope.tableParams.reload();
+			//$scope.tableParams.reload();
 			$scope.operData = response.data;
 			$scope.showSaveBtn = false;
 			//$scope.toggleAdd();
@@ -86,27 +50,31 @@ app.provider('tableDataService', function() {
 			$scope.saveMsg = '连接不成功.';
 		});
 	}
-	
-	function initSelectTable($scope, NgTableParams, $resource, $http, tableFilter, $filter, localData) {
+
+	function initSelectTable($scope, NgTableParams, $resource, $http, tableFilter, $filter) {
 		//初始化选择框对象
 		function initCheckboxes() {
-			$scope.checkboxes = {
-				'checked': false,
-				items: {}
+				$scope.checkboxes = {
+					'checked': false,
+					items: {}
+				}
 			}
-		}
+			//		$scope.$on('dataurl', function(event, dataurl) {
+			//			console.info('dataurl=', dataurl);
+			//			$scope.dataurl = dataurl;
+			//		});
 		
 		function handleData($defer, params) { //刷新数据方法
 			var dataUrl = $scope.dataurl;
-			//console.info('$scope.dataurl=', dataUrl);
+
+			console.info('$scope.dataurl=', dataUrl);
 			if (!YHUtil.hasObj(dataUrl)) {
 				return undefined;
 			}
 			var Api = $resource(dataUrl);
 			var paramInUrl = params.yhUrl();
-			if($scope.paramUrlHandle){
-				paramInUrl = $scope.paramUrlHandle(paramInUrl);
-			}
+			//paramInUrl.add("ctx=");
+			//console.info(paramInUrl);
 			return Api.get(paramInUrl).$promise.then(function(respData) {
 				if (respData == null || respData == undefined) {
 					return;
@@ -115,36 +83,20 @@ app.provider('tableDataService', function() {
 					return;
 				}
 				
+				//$scope.data = respData.data.content;
 				if($scope.handleDataInCtrl != undefined){
 					$scope.data = $scope.handleDataInCtrl(respData.data.content);
 				}else{
 					$scope.data = respData.data.content;
 				}
 				
+				
+
 				params.total(respData.data.totalElements);
 				initCheckboxes();
 				return $scope.data;
 			});
 
-		}
-		
-		function localDataHandle($defer, params) { //刷新数据方法
-			var data = $scope[$scope.localData];
-			//console.info('localDataHandle data=',data);
-			if (data == null || data == undefined) {
-				return;
-			}
-			
-			//$scope.data = respData.data.content;
-			if($scope.handleDataInCtrl != undefined){
-				$scope.data = $scope.handleDataInCtrl(data.content);
-			}else{
-				$scope.data = data.content;
-			}
-			
-			params.total(data.content.length);
-			initCheckboxes();
-			return $scope.data;
 		}
 
 		function initTableParams() { //表格形式配置方法
@@ -153,20 +105,9 @@ app.provider('tableDataService', function() {
 				getHandleDataConf(handleData)
 			);
 		}
-		function initTableParamsLocalData() { //表格形式配置方法
-			$scope.tableParams = new NgTableParams(
-				getPageCountAndSortingConf(tableFilter),
-				getHandleDataConf(localDataHandle)
-			);
-		}
 
 		function initTableCheackboxs() {
 			initCheckboxes();
-			
-			if($scope.selectAllName){
-				$scope.selectAllName = "select_all"
-			}
-			
 			// watch for check all checkbox
 			$scope.$watch('checkboxes.checked', function(value) {
 				angular.forEach($scope.data, function(item) {
@@ -192,214 +133,32 @@ app.provider('tableDataService', function() {
 					$scope.checkboxes.checked = (checked == total);
 				}
 				// grayed checkbox
-				angular.element(document.getElementById($scope.selectAllName)).prop("indeterminate", (checked != 0 && unchecked != 0));
+				angular.element(document.getElementById("select_all")).prop("indeterminate", (checked != 0 && unchecked != 0));
 			}, true);
 			//checkboxes end
 		}
-		
-		$scope.$watch('dataurl',function(values){
-			$scope.tableParams.reload();
-		});
 
-		//启动ng-table参数数据
-		if(localData){
-			initTableParamsLocalData();
-		}else{
-			initTableParams();
-		}
-		
+		initTableParams(); //启动ng-table参数数据
+		initTableCheackboxs();
 	}
-	
-	var saveTableData = function($scope, $http, myScope, index, operData, filterFunc) {
-		console.info('tableService $scope', $scope);
-		console.info('tableService.mySope=', this.myScope);
-		if($scope.validMsg){
-			//清空验证信息
-			for(var key in $scope.validMsg){
-				var __index = key.indexOf(".");
-				if(__index > -1){
-					var __index_str = key.substring(0,__index);
-					if(!$scope.validMsg[__index_str]){
-						$scope.validMsg[__index_str] = {};
-					}
-					$scope.validMsg[__index_str][key.substring(__index+1)] = "";
-				}else{
-					$scope.validMsg[key] = "";
-				}
-			}
-		}
-		$http.post($scope.saveurl,operData).success(function(response) {
-			if(response.errorcode == 1) {
-				if (YHUtil.hasObj(response.data)) {
-					response.data.isShowEdit = false;		
-					for(i in response.data)
-					{
-						$scope.item[i]=response.data[i];
-					}				
-				}
-				if(!(myScope.data instanceof Array)) {
-					myScope.data = new Array();
-				}
-				if(isNaN(parseInt(index))) {					
-					operData.id = response.data.id;
-					myScope.data.add(myScope.data.length, response.data);
-				}
-				else {
-					if(myScope.data.length == 0) {
-						myScope.data.push(response.data);
-					}
-					else {
-						myScope.data[index] = response.data;
-					}
-				}
-				$scope.showSaveBtn = false;
-			}
-			else if(response.errorcode == 100){
-				//将后台表单提交验证错误信息输出到页面
-				if(!$scope.validMsg){
-					$scope.validMsg = {}; //页面验证信息保存对象
-				}
-				//设置验证信息
-				for(var key in response.validErrors){
-					var __index = key.indexOf(".");
-					if(__index > -1){
-						var __index_str = key.substring(0,__index);
-						if(!$scope.validMsg[__index_str]){
-							$scope.validMsg[__index_str] = {};
-						}
-						$scope.validMsg[__index_str][key.substring(__index+1)] = response.validErrors[key];
-					}else{
-						$scope.validMsg[key] = response.validErrors[key];
-					}
-				}
-				return;
-			}
-			else {
-				alert("错误信息: " + response.message + ", 错误代号: " + response.errorcode);
-			}
-		}).error(function() {
-			$scope.saveMsg = '连接不成功.';
-		});
-	};
-	
-	var saveTableDataWithList = function($scope, $http, operData, options) {
-		var tableData =  $scope.tableData;
-		var index = $scope.index;
-		
-		console.info('tableService $scope', $scope);
-		console.info('tableService.tableData=', tableData);
-		if($scope.validMsg){
-			//清空验证信息
-			for(var key in $scope.validMsg){
-				var __index = key.indexOf(".");
-				if(__index > -1){
-					var __index_str = key.substring(0,__index);
-					if(!$scope.validMsg[__index_str]){
-						$scope.validMsg[__index_str] = {};
-					}
-					$scope.validMsg[__index_str][key.substring(__index+1)] = "";
-				}else{
-					$scope.validMsg[key] = "";
-				}
-			}
-		}
-		$http.post($scope.saveurl, operData).success(function(response) {
-			if(response.errorcode == 1) {
-				if(!(tableData instanceof Array)) { tableData = new Array(); }
-				if(isNaN(parseInt(index))) { // 新增
-					for(var key in operData) { delete operData[key]; }  // 清空新增框框所填的内容
-					operData.isShowEdit = false;  // 自动将新增框框隐藏
-					tableData.add(tableData.length, response.data);
-					if(options && angular.isFunction(options.loadAfterSuccess)){
-						options.loadAfterSuccess(tableData, tableData.length, response);
-					}
-				}
-				else {
-					response.data.isShowEdit = true;
-					if(tableData.length == 0) {
-						tableData.push(response.data);
-					}
-					else {
-						tableData[index] = response.data;
-					}
-					if(options && angular.isFunction(options.loadAfterSuccess)){
-						options.loadAfterSuccess(tableData, index, response);
-					}
-				}
-				$scope.showSaveBtn = false;
-			}
-			else if(response.errorcode == 100){
-				//将后台表单提交验证错误信息输出到页面
-				if(!$scope.validMsg){
-					$scope.validMsg = {}; //页面验证信息保存对象
-				}
-				//设置验证信息
-				for(var key in response.validErrors){
-					var __index = key.indexOf(".");
-					if(__index > -1){
-						var __index_str = key.substring(0,__index);
-						if(!$scope.validMsg[__index_str]){
-							$scope.validMsg[__index_str] = {};
-						}
-						$scope.validMsg[__index_str][key.substring(__index+1)] = response.validErrors[key];
-					}else{
-						$scope.validMsg[key] = response.validErrors[key];
-					}
-				}
-				return;
-			}
-			else {
-				console.info("错误信息: ", response);
-			}
-		}).error(function(response) {
-			console.info("错误信息: ", response);
-		});
-	};
-	
-	
-	// 保留该函数，对于不更新到新功能，稍微改动一下函数名，就可保持兼容
-	var saveTableDataByGet = function($scope, $http, myScope, index, operData, filterFunc, options) {
-//		console.info('tableService=', this);
-		var params = $.convertObject2Params(operData, filterFunc);
-		$http.get($scope.saveurl, {params: params}).success(function(response) {
-			if(response.errorcode == 1) {
-				/*if (YHUtil.hasObj(response.data)) {
-					$scope.isAdd = !$scope.isAdd;
-					$scope.operData = response.data;
-					$scope.operData.isShowEdit = false;
-				}*/
-				if(!(myScope.data instanceof Array)) {
-					myScope.data = new Array();
-				}
-				if(isNaN(parseInt(index))) {
-					if(options && options.clearAdd) {  // 表示清空添加框框所填的内容
-						myScope.operData = { isShowEdit: true };
-					}
-					else { myScope.operData.id = response.data.id; }
-					myScope.data.add(myScope.data.length, response.data);
-				}
-				else {
-					if(myScope.data.length == 0) { myScope.data.push(response.data); }
-					else { 
-						myScope.data[index] = response.data;
-						myScope.data[index].isShowEdit = true;
-					}
-				}
-				$scope.showSaveBtn = false;
-			}
-			else {
-				console.info("错误信息: ", response);
-			}
-		}).error(function(response) {
-			console.info("错误信息: ", response);
-		});
-	};
 
-	function initTable($scope, NgTableParams, $resource, $http, tableFilter, vaildDataHandle, $filter,localData) {
-		initSelectTable($scope, NgTableParams, $resource, $http, tableFilter, $filter, localData);
+	function initTable($scope, NgTableParams, $resource, $http, tableFilter, vaildDataHandle, $filter) {
+
+		initSelectTable($scope, NgTableParams, $resource, $http, tableFilter, $filter);
+
+		//		$scope.$on('saveurl', function(event, saveurl) {
+		//			console.info('saveurl=', saveurl);
+		//			$scope.saveurl = saveurl;
+		//		});
+		//		$scope.$on('delurl', function(event, delurl) {
+		//			console.info('delurl=', delurl);
+		//			$scope.delurl = delurl;
+		//		});
+
 
 		//统一验证数据,在键入数据时进行验证
 		$scope.keyUpData = function(operData) {
+			//console.info('keyUpData...operData=',operData);
 			if (operData == null) {
 				$scope.showSaveBtn = false;
 				return;
@@ -418,9 +177,12 @@ app.provider('tableDataService', function() {
 
 		//删除处理器
 		var delHandle = function(data) {
-			$http.post($scope.delurl+"?ids="+data.id, { })
-			.success(function(response) {
-				if (!YHUtil.hasObj(response)) { return; }
+			$http.post($scope.delurl+"?ids="+data.id, {
+				
+			}).success(function(response) {
+				if (!YHUtil.hasObj(response)) {
+					return;
+				}
 				$("#my-alert .am-modal-bd").html(response.message);
 				var $modal = $('#my-alert').modal();
 				$scope.delMsg = response.message;
@@ -429,6 +191,7 @@ app.provider('tableDataService', function() {
 			});
 		}
 
+
 		$scope.delTableData = function(data) {
 			getDelTableDataTemp = data;
 			$('#my-confirm').modal({
@@ -436,33 +199,34 @@ app.provider('tableDataService', function() {
 				onConfirm: function confirm() {
 					delHandle(getDelTableDataTemp);
 				},
-				onCancel: function() { }
+				onCancel: function() {
+
+				}
 			});
 		};
 
+
+
 		$scope.toggleAddTableData = function() {
+
+//			if(!$scope.operData){
+//				$scope.operData = $scope.defaltOperData;
+//			}
 			$scope.operData.isShowEdit=!$scope.operData.isShowEdit;
+			//$scope.operData.isShowEdit=true;
+			//$scope.data.push($scope.operData);
+			//$scope.isAdd = !$scope.isAdd;
 		}
-		//配舱
-		$scope.conf= function(data) {
-			data.isShowEdit=!data.isShowEdit;
-		}
-		//添加车队联系人/添加车队款项信息
-		$scope.gotoPage = function(num, data) {
-			window.location.href = basePath + "/index.do#/" + num;
-		}
-		$scope.getFilterDataByDictMap = function(type) {
-			var list = dictMapByType[type];
-			return list instanceof Array && list.length > 0? list : [{id: "不限"}];
-		}
+
+
 		$scope.toggleEditTableData = function(data) {
+//			$scope.operData = data;
+//			$scope.isAdd = true;
 			data.isShowEdit=!data.isShowEdit;
 		}
 		$scope.isItemShow = function(data) {
-			if(data){
-				return data.isShowEdit;
-			}
-			return data;
+			//console.info('isItemShow data=',data);
+			return data.isShowEdit;
 		}
 	}
 
@@ -476,10 +240,9 @@ app.provider('tableDataService', function() {
 		//字典对象
 		$scope.dictMap = dictMap;
 
-		$scope.defaltOperData = { };
+		$scope.defaltOperData = {
+		};
 	}
-	
-	var testFun = function() { };
 
 	return {
 		runTestFun: testFun,
@@ -492,10 +255,8 @@ app.provider('tableDataService', function() {
 				initTable: initTable,
 				initSelectTable: initSelectTable,
 				initScope: initScope,
-				saveHandle : saveHandle,
-				saveTableData: saveTableData,
-				saveTableDataByGet: saveTableDataByGet,
-				saveTableDataWithList : saveTableDataWithList
+				saveHandle : saveHandle
+					//提供方法结束
 			};
 		}
 	}

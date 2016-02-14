@@ -2,6 +2,7 @@ package org.pushio.webapp.ctrl;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 import javax.servlet.ServletRequest;
 import javax.servlet.http.HttpSession;
@@ -13,7 +14,10 @@ import org.pushio.webapp.entity.base.Employee;
 import org.pushio.webapp.helper.hash.MD5YHWL;
 import org.pushio.webapp.helper.servlet.Servlets;
 import org.pushio.webapp.service.AccountService;
+import org.pushio.webapp.service.EmployeeService;
+import org.pushio.webapp.service.SmtpMailService;
 import org.pushio.webapp.support.PageRequest;
+import org.pushio.webapp.support.PlatformConfiguration;
 import org.pushio.webapp.support.Response;
 import org.pushio.webapp.support.ResponseFactory;
 import org.pushio.webapp.support.StatusCode;
@@ -21,6 +25,8 @@ import org.pushio.webapp.vo.CurrentInfo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.data.domain.Page;
+import org.springframework.data.redis.core.StringRedisTemplate;
+import org.springframework.data.redis.core.ValueOperations;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
@@ -29,11 +35,11 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/account")
 public class AccountCtrl extends BaseController{
 	
-	@Autowired
-	AccountService accountService;
 	
-	@Autowired
-	EmployeeSer accountService;
+	@Autowired private AccountService accountService;
+	@Autowired private EmployeeService employeeService;
+	@Autowired private StringRedisTemplate redisTemplate;//只有STRING 序列化成JSON用着先,等出稳定版 
+	@Autowired private SmtpMailService smtpMailService;
 	
 	@RequestMapping(value = "/find")
 	@ResponseBody
@@ -87,7 +93,7 @@ public class AccountCtrl extends BaseController{
 	 */
 	@RequestMapping(value = "/save.do")
 	@ResponseBody
-	public Response save(Account account,Response response) {
+	public Response save(Account account,Response response,HttpSession session) {
 		Subject currentUser = SecurityUtils.getSubject();
 		CurrentInfo currentInfo = (CurrentInfo) currentUser.getSession()
 				.getAttribute("currentInfo");
@@ -122,35 +128,41 @@ public class AccountCtrl extends BaseController{
 						currentInfo, params);
 
 				if (account != null && account.getId() != null) {
-					String sender = "华正大数据";
-					String subject = "华正大数据提醒您,您的账号已经创建成功.";
+					String sender = "PUSHIO";
+					String subject = "您的账号已经创建成功.";
 					String mailKey = MD5YHWL.MD5(account.getId()+account.getLoginName()+System.currentTimeMillis());
-					keyValueRedisService.set(mailKey, params,259200l);
+					ValueOperations<String, String> valueOperations =  this.redisTemplate.opsForValue();
+					valueOperations.set(mailKey, "", 259200l, TimeUnit.MILLISECONDS);
+
 					String url = PlatformConfiguration.config.getString("visitUri")+"/dodo.do?s="+mailKey;
 					String text = "您的账号是:"+ account.getLoginName() + 
 					"</br>您的密码是:"+ params.get("password") +
 					"</br>有效期为72个小时,请尽快登录平台修改密码并且绑定您的个人手机号码"+ 
 					"登录地址为："+url;
-					mailSendService.sendTextMail(employee.getName(),
-							employee.getEmail(), sender, subject,  text);
+					smtpMailService.sendTextMail(employee.getName(),employee.getEmail(), sender, subject,  text);
 
 				}else{
 					response.setMessage("帐号已激活");
 				}
-
 			}
-
 			else {// 没有邮箱的员工88
 				response.setMessage("没有邮箱的员工无法激活帐号！");
 			}
-
 		} catch (Exception e) {
 			e.printStackTrace();
-			response.setErrorcode(ErrorCode.SYS);
+			response.setErrorcode(StatusCode.SYS);
 			response.setMessage("激活失败");
 		}
 
 		return response;
 
+	}
+	
+	@RequestMapping(value = "/testMailAndRedis")
+	@ResponseBody
+	public void testMailAndRedis(){
+		ValueOperations<String, String> valueOperations =  this.redisTemplate.opsForValue();
+		valueOperations.set("donggege", "东哥哥真棒", 259200l, TimeUnit.MILLISECONDS);
+		smtpMailService.sendTextMail("18520786445@qq.com","18520786445@qq.com", "PUSHIO", "PUSHIO发邮件测试", "东哥哥真棒");
 	}
 }
