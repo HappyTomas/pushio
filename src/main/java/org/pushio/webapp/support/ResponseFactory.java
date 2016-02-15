@@ -23,7 +23,7 @@ public class ResponseFactory {
 
 	public static Response getResponse() {
 		Response response = new Response();
-		response.setErrorcode(StatusCode.OK);
+		response.setStateCode(StateCode.OK);
 		response.setMessage("SUCCESS");
 		return response;
 	}

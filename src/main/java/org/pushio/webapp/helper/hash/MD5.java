@@ -2,7 +2,7 @@ package org.pushio.webapp.helper.hash;
 
 import java.security.MessageDigest;
 
-public class MD5YHWL {
+public class MD5 {
 	private final static char hexDigits[] = { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9',
 			'a', 'b', 'c', 'd', 'e', 'f' };
 	
@@ -26,7 +26,7 @@ public class MD5YHWL {
 		}
 	}
 	public static void main(String[] args){
-		System.out.println(MD5YHWL.MD5("1"));
+		System.out.println(MD5.MD5("1"));
 	}
 
 }

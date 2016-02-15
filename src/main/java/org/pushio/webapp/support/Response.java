@@ -16,7 +16,7 @@ import java.util.Map;
 public class Response implements Serializable {
 
 	private static final long serialVersionUID = -1154107344366063475L;
-	private short errorcode;
+	private short stateCode;
 	private String message;
 	private Object data;
 	private String sid;
@@ -35,16 +35,16 @@ public class Response implements Serializable {
 		this.sid = sid;
 	}
 
-	public short getErrorcode() {
+	public short getStateCode() {
 		if (validErrors.size() > 0) {
-			errorcode = StatusCode.VALID_FAIL;
+			stateCode = StateCode.VALID_FAIL;
 			message = "验证失败";
 		}
-		return errorcode;
+		return stateCode;
 	}
 
-	public void setErrorcode(short errorcode) {
-		this.errorcode = errorcode;
+	public void setStateCode(short stateCode) {
+		this.stateCode = stateCode;
 	}
 
 	public String getMessage() {

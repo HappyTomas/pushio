@@ -1,6 +1,5 @@
-package org.pushio.webapp.ctrl.example;
+package org.pushio.webapp.ctrl;
 
-import org.pushio.webapp.ctrl.BaseController;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -10,6 +9,6 @@ public class IndexCtrl extends BaseController{
 	
 	@RequestMapping("/")
 	public String index(){
-		return "hello";
+		return "你好我是INDEX";
 	}
 }

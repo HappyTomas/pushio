@@ -12,7 +12,7 @@ import javax.persistence.Query;
 import org.apache.log4j.Logger;
 import org.pushio.webapp.entity.base.Account;
 import org.pushio.webapp.entity.base.Employee;
-import org.pushio.webapp.helper.hash.MD5YHWL;
+import org.pushio.webapp.helper.hash.MD5;
 import org.pushio.webapp.helper.language.Pinyin4jUtil;
 import org.pushio.webapp.helper.string.ArrayToString;
 import org.pushio.webapp.repository.AccountRepository;
@@ -147,7 +147,7 @@ public class AccountService {
 		if((account = employee.getAccount()) != null){//已经存在帐号，那么就激活它
 			if(account.getStatus()==0){ // 未激活
 				account.setStatus(1);
-				account.setPassword(MD5YHWL.MD5(pwd));
+				account.setPassword(MD5.MD5(pwd));
 				employee.setAccount(account);
 				employeeRepository.save(employee);
 				pinyinName = Pinyin4jUtil.toHanyuPinyin(employee.getName());
@@ -169,7 +169,7 @@ public class AccountService {
 			}
 			account = new Account();
 			account.setLoginName(pinyinName);
-			account.setPassword(MD5YHWL.MD5(pwd));
+			account.setPassword(MD5.MD5(pwd));
 			account.setEmployeeByAddUserId(currentInfo.getEmplpyee());
 			account.setStatus(1);
 			account.setAddDate(new Date());

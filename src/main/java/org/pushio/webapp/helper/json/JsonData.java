@@ -2,9 +2,9 @@ package org.pushio.webapp.helper.json;
 
 import java.util.List;
 
-import org.pushio.webapp.support.StatusCode;
 import org.pushio.webapp.support.ReduceJsonDataParam;
 import org.pushio.webapp.support.Response;
+import org.pushio.webapp.support.StateCode;
 
 public class JsonData {
 	private Response response;
@@ -13,7 +13,7 @@ public class JsonData {
 	
 	public JsonData() {
 		response = new Response();
-		response.setErrorcode(StatusCode.OK);
+		response.setStateCode(StateCode.OK);
 		response.setMessage("SUCCESS");
 	}
 	

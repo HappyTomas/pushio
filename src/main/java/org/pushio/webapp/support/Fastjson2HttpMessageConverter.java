@@ -77,7 +77,7 @@ public class Fastjson2HttpMessageConverter extends AbstractHttpMessageConverter<
         String text;
         if(obj instanceof Response) {
         	Response resp = (Response) obj;
-        	if(resp.getErrorcode() == StatusCode.VALID_FAIL){
+        	if(resp.getStateCode() == StateCode.VALID_FAIL){
         		//验证错误信息直接输出JSON
         		text = JsonUtil.toJSONStringWithDateFormat(obj, JsonUtil.DATE_FORMAT, features);
         	}else{
