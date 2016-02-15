@@ -15,7 +15,7 @@ $.convertObj2ParamsRecurse = function(obj, newObj, dataType, key, isFunc, callba
 		var isOk = (key && key.length > 0);
 		for(var k in obj) {
 			o = obj[k];
-			if(!o && o !== 0 && o !== false) { continue; } // 跳过空值，无用的值
+			if(!o && o !== 0) { continue; } // 跳过空值，无用的值
 			if(isFunc && (!callback(k, o))) {
 				continue;
 			}

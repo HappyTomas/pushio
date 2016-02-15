@@ -51,24 +51,6 @@ String.prototype.hashCode = function() {
 	return ret;
 };
 
-String.prototype.toDate = function() {
-	var str = this;
-	var reBatCatRat =/[0-9]+/gi;
-	var arr = str.match(reBatCatRat);
-	var data = new Date();
-	for(var i = 0, l = arr.length; i < l; ++i) {
-		switch(i) {
-			case 0: data.setFullYear(parseInt(arr[i])); break;
-			case 1: data.setMonth(parseInt(arr[i])-1); break;
-			case 2: data.setDate(parseInt(arr[i])); break;
-			case 3: data.setHours(parseInt(arr[i])); break;
-			case 4: data.setMinutes(parseInt(arr[i])); break;
-			case 5: data.setSeconds(parseInt(arr[i])); break;
-		}
-	};
-	return data;
-};
-
 Date.prototype.Format = function(fmt) {
 	var _h = this.getHours();
 	var o = {
@@ -114,53 +96,4 @@ Array.prototype.removeByIndex = function(index) {
 	}
 };
 
-var userAgent = navigator.userAgent.toLowerCase(); 
-var browserType = { 
-	version: (userAgent.match( /.+(?:rv|it|ra|ie)[\/: ]([\d.]+)/ ) || [])[1], 
-	safari: /webkit/.test( userAgent ), 
-	opera: /opera/.test( userAgent ), 
-	msie:  /msie/.test( userAgent ) && !/opera/.test( userAgent ), 
-	mozilla: /mozilla/.test( userAgent ) && !/(compatible|webkit)/.test(userAgent)
-};
-
-/**
- * @see 这个函数用于合成类路径参数，传递到后台
- * @param a
- * @returns {String}
- */
-makeRjd = function(a) {
-	return "rjd=" + (a instanceof Array? a.join(",") : a);
-}
-
-function initAccordion($accordion) {
-  var selector = {
-    item: '.am-accordion-item',
-    title: '.am-accordion-title',
-    body: '.am-accordion-bd',
-    disabled: '.am-disabled'
-  };
-
-  $accordion.each(function(i, item) {
-    var options = eval("(" + $(item).attr('data-am-accordion') + ")");
-    var $title = $(item).find(selector.title);
-
-    $title.on('click.accordion.amui', function() {
-      var $collapse = $(this).next(selector.body);
-      var $parent = $(this).parent(selector.item);
-      var data = $collapse.data('amui.collapse');
-      if ($parent.is(selector.disabled)) { return; }
-      $parent.toggleClass('am-active');
-      if (!data) {
-        $collapse.collapse();
-      } else {
-        $collapse.collapse('toggle');
-      }
-
-      !options.multiple &&
-      $(item).children('.am-active').
-        not($parent).not(selector.disabled).removeClass('am-active').
-        find(selector.body + '.am-in').collapse('close');
-    });
-  });
-};
 
