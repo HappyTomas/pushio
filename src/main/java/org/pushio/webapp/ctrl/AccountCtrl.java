@@ -15,7 +15,9 @@ import org.pushio.webapp.helper.hash.MD5;
 import org.pushio.webapp.helper.servlet.Servlets;
 import org.pushio.webapp.service.AccountService;
 import org.pushio.webapp.service.EmployeeService;
+import org.pushio.webapp.service.SmtpMailService;
 import org.pushio.webapp.support.PageRequest;
+import org.pushio.webapp.support.PlatformConfiguration;
 import org.pushio.webapp.support.Response;
 import org.pushio.webapp.support.ResponseFactory;
 import org.pushio.webapp.support.StateCode;
@@ -37,7 +39,7 @@ public class AccountCtrl extends BaseController{
 	@Autowired private AccountService accountService;
 	@Autowired private EmployeeService employeeService;
 	@Autowired private StringRedisTemplate redisTemplate;//只有STRING 序列化成JSON用着先,等出稳定版 
-//	@Autowired private SmtpMailService smtpMailService;
+	@Autowired private SmtpMailService smtpMailService;
 	
 	@RequestMapping(value = "/find")
 	@ResponseBody
@@ -132,12 +134,12 @@ public class AccountCtrl extends BaseController{
 					ValueOperations<String, String> valueOperations =  this.redisTemplate.opsForValue();
 					valueOperations.set(mailKey, "", 259200l, TimeUnit.MILLISECONDS);
 
-//					String url = PlatformConfiguration.config.getString("visitUri")+"/dodo.do?s="+mailKey;
+					String url = PlatformConfiguration.config.getString("visitUri")+"/dodo.do?s="+mailKey;
 					String text = "您的账号是:"+ account.getLoginName() + 
 					"</br>您的密码是:"+ params.get("password") +
-					"</br>有效期为72个小时,请尽快登录平台修改密码并且绑定您的个人手机号码";
-//					"登录地址为："+url;
-//					smtpMailService.sendTextMail(employee.getName(),employee.getEmail(), sender, subject,  text);
+					"</br>有效期为72个小时,请尽快登录平台修改密码并且绑定您的个人手机号码"+
+					"登录地址为："+url;
+					smtpMailService.sendTextMail(employee.getName(),employee.getEmail(), sender, subject,  text);
 
 				}else{
 					response.setMessage("帐号已激活");
@@ -161,6 +163,6 @@ public class AccountCtrl extends BaseController{
 	public void testMailAndRedis(){
 		ValueOperations<String, String> valueOperations =  this.redisTemplate.opsForValue();
 		valueOperations.set("donggege", "东哥哥真棒", 259200l, TimeUnit.MILLISECONDS);
-//		smtpMailService.sendTextMail("18520786445@qq.com","18520786445@qq.com", "PUSHIO", "PUSHIO发邮件测试", "东哥哥真棒");
+		smtpMailService.sendTextMail("18520786445@qq.com","18520786445@qq.com", "PUSHIO", "PUSHIO发邮件测试", "东哥哥真棒");
 	}
 }
